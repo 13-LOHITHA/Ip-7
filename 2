@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Selection</title>
+</head>
+<body>
+    <h1>Select Your Preferred Language</h1>
+    <form action="LanguageServlet" method="post">
+        <label for="language">Preferred Language:</label>
+        <select id="language" name="language">
+            <option value="english">English</option>
+            <option value="french">French</option>
+            <option value="spanish">Spanish</option>
+        </select>
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
+
+
+
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/LanguageServlet")
+public class LanguageServlet extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String language = request.getParameter("language");
+        
+        // Store the selected language in a cookie
+        Cookie cookie = new Cookie("preferredLanguage", language);
+        cookie.setMaxAge(30 * 24 * 60 * 60); // Cookie valid for 30 days
+        response.addCookie(cookie);
+        
+        // Redirect to the greeting page
+        response.sendRedirect("GreetingPage");
+    }
+}
+
+
+
+
+
+
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/GreetingPage")
+public class GreetingPage extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Retrieve preferred language from cookie
+        String language = "";
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("preferredLanguage")) {
+                    language = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        
+        // Display greeting in the preferred language
+        String greeting = "";
+        switch (language) {
+            case "english":
+                greeting = "Hello!";
+                break;
+            case "french":
+                greeting = "Bonjour!";
+                break;
+            case "spanish":
+                greeting = "¡Hola!";
+                break;
+            default:
+                greeting = "Hello!";
+        }
+        
+        response.setContentType("text/html");
+        response.getWriter().println("<h1>" + greeting + "</h1>");
+    }
+}
