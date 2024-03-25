@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Quiz</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+    <h1>Create Quiz</h1>
+    <form action="QuizServlet" method="post">
+        <label for="question">Question:</label>
+        <input type="text" id="question" name="question" required><br>
+        <label for="answer">Answer:</label>
+        <input type="text" id="answer" name="answer" required><br>
+        <button type="submit">Add Question</button><br><br>
+    </form>
+
+    <h2>Quiz Preview</h2>
+    <ul>
+        <!-- Servlet will populate this list -->
+    </ul>
+</body>
+</html>
+
+
+
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+form {
+    text-align: center;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+    text-align: center;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+
+
+
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+@WebServlet("/QuizServlet")
+public class QuizServlet extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String question = request.getParameter("question");
+        String answer = request.getParameter("answer");
+        
+        HttpSession session = request.getSession();
+        @SuppressWarnings("unchecked")
+        ArrayList<String> quiz = (ArrayList<String>) session.getAttribute("quiz");
+        
+        if (quiz == null) {
+            quiz = new ArrayList<>();
+            session.setAttribute("quiz", quiz);
+        }
+        
+        quiz.add("Q: " + question + " - A: " + answer);
+        
+        response.sendRedirect("index.html");
+    }
+}
